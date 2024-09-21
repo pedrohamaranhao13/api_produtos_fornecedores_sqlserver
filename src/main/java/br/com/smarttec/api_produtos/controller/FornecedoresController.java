@@ -1,5 +1,6 @@
 package br.com.smarttec.api_produtos.controller;
 
+import br.com.smarttec.api_produtos.dtos.FornecedorGetDto;
 import br.com.smarttec.api_produtos.dtos.FornecedorPostDto;
 import br.com.smarttec.api_produtos.dtos.FornecedorPutDto;
 import br.com.smarttec.api_produtos.entities.Fornecedor;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,12 +84,21 @@ public class FornecedoresController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Fornecedor>> getAll() {
+    public ResponseEntity<List<FornecedorGetDto>> getAll() {
         try {
 
             List<Fornecedor> fornecedores = fornecedorRepository.findAll();
+            List<FornecedorGetDto> lista = new ArrayList<FornecedorGetDto>();
 
-            return ResponseEntity.status(200).body(fornecedores);
+            for (Fornecedor fornecedor : fornecedores){
+                FornecedorGetDto dto = new FornecedorGetDto();
+                dto.setIdFornecedor(fornecedor.getIdFornecedor());
+                dto.setNome(fornecedor.getNome());
+                dto.setCnpj(fornecedor.getCnpj());
+                dto.setTelefone(fornecedor.getTelefone());
+                lista.add(dto);
+            }
+            return ResponseEntity.status(200).body(lista);
 
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
@@ -95,14 +106,21 @@ public class FornecedoresController {
     }
 
     @GetMapping("{idFornecedor}")
-    public  ResponseEntity<Fornecedor> getById(@PathVariable("idFornecedor") Integer idFornecedor) {
+    public  ResponseEntity<FornecedorGetDto> getById(@PathVariable("idFornecedor") Integer idFornecedor) {
         try {
 
             Optional<Fornecedor> optional = fornecedorRepository.findById(idFornecedor);
 
             if (optional.isPresent()) {
                 Fornecedor fornecedor = optional.get();
-                return ResponseEntity.status(200).body(fornecedor);
+
+                FornecedorGetDto dto = new FornecedorGetDto();
+                dto.setIdFornecedor(fornecedor.getIdFornecedor());
+                dto.setNome(fornecedor.getNome());
+                dto.setCnpj(fornecedor.getCnpj());
+                dto.setTelefone(fornecedor.getTelefone());
+
+                return ResponseEntity.status(200).body(dto);
             } else {
                 return ResponseEntity.status(204).body(null);
             }
